@@ -1,0 +1,1006 @@
+ 
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>متجرنا</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* ===== CSS VARIABLES ===== */
+        :root {
+            --primary: #1e3799;
+            --primary-dark: #0c2461;
+            --secondary: #f6b93b;
+            --bg-body: #f0f2f5;
+            --bg-surface: #ffffff;
+            --text-main: #1e272e;
+            --text-muted: #636e72;
+            --border-color: #e0e4e8;
+            --danger: #e74c3c;
+            --success: #25d366;
+            --shadow-sm: 0 2px 10px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 16px rgba(0,0,0,0.06);
+            --shadow-lg: 0 16px 40px rgba(0,0,0,0.12);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: var(--bg-body);
+            color: var(--text-main);
+        }
+
+        /* ===== SPLASH SCREEN ===== */
+        #startScreen {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        #startScreen.hidden {
+            opacity: 0;
+            transform: scale(1.05);
+            pointer-events: none;
+        }
+
+        .start-logo {
+            font-size: 5rem;
+            color: var(--secondary);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .start-title {
+            font-size: 3rem;
+            color: #fff;
+            font-weight: 800;
+        }
+
+        .start-sub {
+            color: rgba(255, 255, 255, 0.8);
+            margin: 0.5rem 0 2rem;
+        }
+
+        /* ===== MAIN APP ===== */
+        #app {
+            display: none;
+            flex-direction: column;
+            min-height: 100vh;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        #app.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            background: var(--bg-surface);
+            padding: 0.8rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--primary-dark);
+        }
+
+        .header-brand i {
+            color: var(--secondary);
+        }
+
+        .header-search {
+            flex: 1;
+            max-width: 500px;
+            min-width: 180px;
+            position: relative;
+        }
+
+        .header-search input {
+            width: 100%;
+            padding: 0.7rem 2.5rem 0.7rem 3rem;
+            border: 2px solid var(--border-color);
+            border-radius: 50px;
+            font-size: 1rem;
+            font-family: 'Cairo', sans-serif;
+            outline: none;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+        }
+
+        .header-search input:focus {
+            border-color: var(--primary);
+            background: var(--bg-surface);
+            box-shadow: 0 0 0 4px rgba(30, 55, 153, 0.1);
+        }
+
+        .header-search .fa-search {
+            position: absolute;
+            right: 1.2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #a0a6ad;
+        }
+
+        .header-search .clear-btn {
+            position: absolute;
+            left: 1.2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #a0a6ad;
+            cursor: pointer;
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1rem;
+        }
+
+        .header-search .clear-btn:hover {
+            color: var(--danger);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1.2rem;
+        }
+
+        .header-actions .icon-btn {
+            background: none;
+            border: none;
+            font-size: 1.4rem;
+            color: var(--text-main);
+            cursor: pointer;
+            position: relative;
+            transition: color 0.3s;
+        }
+        
+        .header-actions .icon-btn:hover {
+            color: var(--primary);
+        }
+
+        .header-actions .badge {
+            position: absolute;
+            top: -6px;
+            left: -8px;
+            background: var(--danger);
+            color: #fff;
+            font-size: 0.6rem;
+            padding: 2px 6px;
+            border-radius: 50%;
+            font-weight: bold;
+        }
+
+        /* ===== TABS ===== */
+        .tabs-wrapper {
+            background: var(--bg-surface);
+            padding: 0 2rem;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 72px;
+            z-index: 99;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            overflow-x: auto;
+            padding: 0.5rem 0;
+            scrollbar-width: none;
+        }
+
+        .tabs::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tab-btn {
+            padding: 0.6rem 1.8rem;
+            font-family: 'Cairo', sans-serif;
+            font-weight: 700;
+            border: none;
+            border-radius: 30px;
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .tab-btn:hover {
+            background: var(--bg-body);
+            color: var(--primary-dark);
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .tab-btn i {
+            margin-left: 8px;
+        }
+
+        /* ===== PRODUCTS ===== */
+        .products-section {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            flex: 1;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 2rem;
+        }
+
+        .product-card {
+            background: var(--bg-surface);
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(0,0,0,0.03);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .product-card .img-wrap {
+            width: 100%;
+            aspect-ratio: 1/1;
+            overflow: hidden;
+            background: var(--bg-body);
+            position: relative;
+        }
+
+        .product-card .img-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s ease;
+        }
+
+        .product-card:hover .img-wrap img {
+            transform: scale(1.08);
+        }
+
+        .product-card .badge-cat {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(30, 55, 153, 0.9);
+            color: #fff;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 6px 14px;
+            border-radius: 20px;
+            backdrop-filter: blur(4px);
+        }
+
+        .product-card .info {
+            padding: 1.2rem;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .product-card .info h4 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--text-main);
+            line-height: 1.4;
+        }
+
+        .product-card .info .price {
+            font-weight: 800;
+            color: var(--primary);
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-card .info .price small {
+            font-weight: 600;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-right: 4px;
+        }
+
+        .product-card .info .desc {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            margin-bottom: 1rem;
+            flex: 1;
+        }
+
+        .product-card .view-btn {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .product-card .view-btn i {
+            transition: transform 0.3s ease;
+        }
+
+        .product-card:hover .view-btn i {
+            transform: translateX(-6px);
+        }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-muted);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: #dfe6e9;
+            margin-bottom: 1rem;
+        }
+
+        /* ===== MODAL ===== */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(8px);
+            z-index: 999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.open {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-box {
+            background: var(--bg-surface);
+            border-radius: 24px;
+            max-width: 850px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 2.5rem;
+            position: relative;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .modal-overlay.open .modal-box {
+            transform: translateY(0);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1.2rem;
+            left: 1.2rem;
+            background: var(--bg-body);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+        }
+
+        .modal-close:hover {
+            background: var(--danger);
+            color: #fff;
+            transform: rotate(90deg);
+        }
+
+        .modal-content {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .modal-top {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        @media (min-width: 768px) {
+            .modal-top {
+                flex-direction: row;
+                align-items: flex-start;
+            }
+        }
+
+        .modal-img {
+            border-radius: 16px;
+            overflow: hidden;
+            background: var(--bg-body);
+            aspect-ratio: 1/1;
+            max-height: 400px;
+            flex: 1;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .modal-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .modal-details {
+            flex: 1.2;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .modal-details h2 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--text-main);
+            line-height: 1.3;
+        }
+
+        .modal-details .modal-price {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .modal-details p {
+            color: var(--text-muted);
+            line-height: 1.7;
+            font-size: 1.05rem;
+        }
+
+        .modal-details .modal-specs {
+            background: #f8f9fa;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            border-right: 4px solid var(--primary);
+            color: var(--text-main);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .modal-video {
+            border-radius: 16px;
+            overflow: hidden;
+            background: #000;
+            aspect-ratio: 16/9;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .modal-video video {
+            width: 100%;
+            height: 100%;
+            display: block;
+            outline: none;
+        }
+
+        .whatsapp-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 1rem 2.5rem;
+            background: var(--success);
+            color: #fff;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            font-family: 'Cairo', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            width: fit-content;
+            margin: 0 auto;
+            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+        }
+
+        .whatsapp-btn:hover {
+            transform: translateY(-3px);
+            background: #20b85a;
+            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
+        }
+
+        /* ===== TOAST NOTIFICATION ===== */
+        .toast {
+            position: fixed;
+            bottom: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--primary-dark);
+            color: #fff;
+            padding: 0.8rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            box-shadow: var(--shadow-lg);
+            transition: bottom 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toast.show {
+            bottom: 30px;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 600px) {
+            .header {
+                padding: 0.8rem 1rem;
+            }
+            .header-brand {
+                font-size: 1.3rem;
+            }
+            .header-search {
+                order: 3;
+                flex: 1 1 100%;
+                max-width: 100%;
+            }
+            .tabs-wrapper {
+                padding: 0 0.5rem;
+                top: 66px;
+            }
+            .tab-btn {
+                padding: 0.5rem 1.2rem;
+                font-size: 0.9rem;
+            }
+            .products-section {
+                padding: 1.5rem 1rem;
+            }
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+                gap: 1rem;
+            }
+            .modal-box {
+                padding: 1.5rem;
+                border-radius: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== SPLASH SCREEN ===== -->
+    <div id="startScreen">
+        <div class="start-logo"><i class="fas fa-store"></i></div>
+        <h1 class="start-title">متجرنا</h1>
+        <p class="start-sub">جاري تحضير أحدث التشكيلات...</p>
+    </div>
+
+    <!-- ===== MAIN APP ===== -->
+    <div id="app">
+        <!-- HEADER -->
+        <header class="header">
+            <div class="header-brand">
+                <i class="fas fa-store-alt"></i>
+                <span>متجرنا</span>
+            </div>
+
+            <div class="header-search">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="ابحث عن منتج، فئة، أو تفاصيل..." aria-label="البحث عن منتج" />
+                <button class="clear-btn" id="clearSearchBtn" aria-label="مسح البحث">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="header-actions">
+                <button class="icon-btn action-btn" aria-label="المفضلة" data-message="تمت الإضافة إلى المفضلة 🤍">
+                    <i class="far fa-heart"></i>
+                </button>
+                <button class="icon-btn action-btn" aria-label="سلة المشتريات" data-message="تم تحديث السلة 🛒">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span class="badge" id="cartBadge">3</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- TABS -->
+        <div class="tabs-wrapper">
+            <div class="tabs" id="tabsContainer">
+                <button class="tab-btn active" data-category="all">
+                    <i class="fas fa-th-large"></i> الكل
+                </button>
+                <button class="tab-btn" data-category="الملبس">
+                    <i class="fas fa-tshirt"></i> الملبس
+                </button>
+                <button class="tab-btn" data-category="الكسسوارات">
+                    <i class="fas fa-gem"></i> الكسسوارات
+                </button>
+                <button class="tab-btn" data-category="العروض الخاصه">
+                    <i class="fas fa-tags"></i> العروض الخاصه
+                </button>
+            </div>
+        </div>
+
+        <!-- PRODUCTS -->
+        <section class="products-section">
+            <div class="products-grid" id="productsGrid"></div>
+        </section>
+    </div>
+
+    <!-- ===== MODAL ===== -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-box">
+            <button class="modal-close" id="modalClose" aria-label="إغلاق النافذة"><i class="fas fa-times"></i></button>
+            <div class="modal-content" id="modalContent"></div>
+        </div>
+    </div>
+
+    <!-- ===== TOAST ===== -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // ============================================================
+        //  البيانات
+        // ============================================================
+       const products =  [{
+            id: 1,
+            name: 'قميص قطني مريح',
+            category: 'الملبس',
+            image: 'Screenshot_20250703-181908.png',
+            description: 'قميص قطني 100% ناعم ومثالي للاستخدام اليومي. مصمم ليمنحك راحة فائقة وأناقة عصرية.',
+            specs: 'خامة: 100% قطن • مقاسات: S, M, L, XL • ألوان متعددة',
+            price: '50',
+            video: '2_5436333388665474833.mp4',
+            whatsapp: '966501234567'
+        }, {
+            id: 2,
+            name: 'جينز كلاسيك',
+            category: 'الملبس',
+            image: 'Screenshot_20250703-181908.png',
+            description: 'جينز كلاسيك بقصة مستقيمة تناسب جميع الأوقات. جودة عالية وتفاصيل دقيقة.',
+            specs: 'خامة: 98% قطن، 2% إيلاستان • مقاسات: 28-40',
+            price: '120',
+            video: '2_5436333388665474833.mp4',
+            whatsapp: '966501234567'
+        }, {
+            id: 3,
+            name: 'جاكيت شتوي أنيق',
+            category: 'الملبس',
+            image: 'Screenshot_20250703-181908.png',
+            description: 'جاكيت شتوي مصنوع من الصوف الطبيعي، يمنحك دفء ممتاز وأناقة لا تضاهى.',
+            specs: 'خامة: صوف طبيعي • مقاسات: M, L, XL, XXL',
+            price: '200',
+            video: '2_5436333388665474833.mp4',
+            whatsapp: '966501234567'
+        }, {
+            id: 4,
+            name: 'فستان صيفي منقوش',
+            category: 'الملبس',
+            image: 'Screenshot_20250703-181908.png',
+            description: 'فستان صيفي خفيف بنقوش عصرية، مثالي للإطلالات اليومية والمناسبات.',
+            specs: 'خامة: 100% قطن • مقاسات: S, M, L',
+            price: '80',
+            video: '2_5436333388665474833.mp4',
+            whatsapp: '966501234567'
+        }, {
+            id: 5,
+            name: 'ساعة يد فاخرة',
+            category: 'الكسسوارات',
+            image: 'Screenshot_20250703-181908.png',
+            description: 'ساعة يد أنيقة بتصميم عصري، مقاومة للماء، مناسبة للرجال والنساء.',
+            specs: 'خامة: ستانلس ستيل • مقاومة للماء حتى 50م • حركة كوارتز',
+            price: '250',
+            video: '2_5436333388665474833.mp4',
+            whatsapp: '966501234567'
+        }, {
+            id: 6,
+            name: 'قلادة ذهبية',
+            category: 'الكسسوارات',
+            image: 'Screenshot_20250703-181908.png',
+            description: 'قلادة ذهبية عيار 18 بتصميم راقٍ، تُضفي لمسة من الفخامة على أي إطلالة.',
+            specs: 'خامة: ذهب عيار 18 • وزن: 5 جرام',
+            price: '500',
+            video: '2_5436333388665474833.mp4',
+            whatsapp: '966501234567'
+        }, {
+            id: 7,
+            name: 'نظارات شمسية',
+            category: 'الكسسوارات',
+            image: '2_5436333388665474833.mp4',
+            description: 'نظارات شمسية عصرية توفر حماية كاملة من الأشعة فوق البنفسجية.',
+            specs: 'حماية UV400 • إطار معدني • عدسات مستقطبة',
+            price: '150',
+            video: '2_5436333388665474833.mp4',
+            whatsapp: '966501234567'
+        }, {
+            id: 8,
+            name: 'قبعة صيفية',
+            category: 'الكسسوارات',
+            image: 'Screenshot_20250703-181908.png',
+            description: 'قبعة صيفية خفيفة تحميك من أشعة الشمس وتضفي لمسة أنيقة.',
+            specs: 'خامة: قطن • مقاسات: M, L',
+            price: '40',
+            video: '2_5436333388665474833.mp4',
+            whatsapp: '966501234567'
+        }, {
+            id: 9,
+            name: 'عرض خاص: قميص + بنطلون',
+            category: 'العروض الخاصه',
+            image: 'Screenshot_20250703-181908.png',
+            description: 'طقم مميز يتضمن قميص قطني وبنطلون جينز، بخصم 30% على السعر الأصلي.',
+            specs: 'يشمل: قميص + جينز • خصم 30% • كميات محدودة',
+            price: '119',
+            video: '2_5436333388665474833.mp4',
+            whatsapp: '966501234567'
+        }, {
+            id: 10,
+            name: 'عرض الساعة الفاخرة',
+            category: 'العروض الخاصه',
+            image: 'Screenshot_20250703-181908.png',
+            description: 'ساعة يد فاخرة بخصم 20% لفترة محدودة. فرصة لا تعوض!',
+            specs: 'خصم 20% • سعر مخفض • ضمان سنة',
+            price: '200',
+            video: '2_5436333388665474833.mp4',
+            whatsapp: '966501234567'
+        }, {
+            id: 11,
+            name: 'طقم هدايا مميز',
+            category: 'العروض الخاصه',
+            image: 'Screenshot_20250703-181908.png',
+            description: 'طقم هدايا فاخر يشمل قميص، ساعة، وقلادة. هدية مثالية للأحباب.',
+            specs: 'يشمل: قميص + ساعة + قلادة • تغليف هدايا مجاني',
+            price: '350',
+            video: '2_5436333388665474833.mp4',
+            whatsapp: '966501234567'
+        }];
+
+        // ============================================================
+        //  المتغيرات وعناصر DOM
+        // ============================================================
+        let currentCategory = 'all';
+        let searchQuery = '';
+
+        const startScreen = document.getElementById('startScreen');
+        const app = document.getElementById('app');
+        const productsGrid = document.getElementById('productsGrid');
+        const searchInput = document.getElementById('searchInput');
+        const clearSearchBtn = document.getElementById('clearSearchBtn');
+        const tabsContainer = document.getElementById('tabsContainer');
+        const modalOverlay = document.getElementById('modalOverlay');
+        const modalContent = document.getElementById('modalContent');
+        const modalClose = document.getElementById('modalClose');
+        const toast = document.getElementById('toast');
+
+        // ============================================================
+        //  التهيئة وشاشة البداية
+        // ============================================================
+        window.addEventListener('DOMContentLoaded', () => {
+            // تحويل شاشة البداية لشاشة تحميل تختفي تلقائياً
+            setTimeout(() => {
+                startScreen.classList.add('hidden');
+                app.classList.add('show');
+                renderProducts();
+                
+                setTimeout(() => {
+                    startScreen.style.display = 'none';
+                }, 600);
+            }, 1200); // 1.2 ثانية كافية كشاشة ترحيبية
+        });
+
+        // ============================================================
+        //  نظام الإشعارات (Toast)
+        // ============================================================
+        let toastTimeout;
+        function showToast(message) {
+            toast.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
+            toast.classList.add('show');
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        document.querySelectorAll('.action-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                showToast(btn.dataset.message);
+                if(btn.querySelector('.fa-shopping-bag')) {
+                    const badge = document.getElementById('cartBadge');
+                    badge.textContent = parseInt(badge.textContent) + 1;
+                }
+            });
+        });
+
+        // ============================================================
+        //  عرض المنتجات
+        // ============================================================
+        function renderProducts() {
+            const filtered = products.filter(p => {
+                const matchCategory = currentCategory === 'all' || p.category === currentCategory;
+                const matchSearch = p.name.includes(searchQuery) || 
+                                   p.description.includes(searchQuery) || 
+                                   p.category.includes(searchQuery);
+                return matchCategory && matchSearch;
+            });
+
+            if (filtered.length === 0) {
+                productsGrid.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-box-open"></i>
+                        <h3>لا توجد منتجات مطابقة</h3>
+                        <p>جرب تعديل كلمات البحث أو تصفح الأقسام الأخرى</p>
+                    </div>
+                `;
+                return;
+            }
+
+            productsGrid.innerHTML = filtered.map(p => `
+                <div class="product-card" data-id="${p.id}">
+                    <div class="img-wrap">
+                        <img src="${p.image}" alt="${p.name}" loading="lazy" />
+                        <span class="badge-cat">${p.category}</span>
+                    </div>
+                    <div class="info">
+                        <h4>${p.name}</h4>
+                        <div class="price">${p.price} <small>ريال</small></div>
+                        <div class="desc">${p.description}</div>
+                        <div class="view-btn"><i class="fas fa-arrow-left"></i> تفاصيل المنتج</div>
+                    </div>
+                </div>
+            `).join('');
+
+            document.querySelectorAll('.product-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const id = parseInt(card.dataset.id);
+                    const product = products.find(p => p.id === id);
+                    if (product) openModal(product);
+                });
+            });
+        }
+
+        // ============================================================
+        //  النافذة المنبثقة
+        // ============================================================
+        function openModal(product) {
+            modalContent.innerHTML = `
+                <div class="modal-top">
+                    <div class="modal-img">
+                        <img src="${product.image}" alt="${product.name}" />
+                    </div>
+                    <div class="modal-details">
+                        <h2>${product.name}</h2>
+                        <div class="modal-price">${product.price} <small>ريال</small></div>
+                        <p>${product.description}</p>
+                        <div class="modal-specs">
+                            <strong><i class="fas fa-sliders-h"></i> المواصفات الأساسية:</strong><br/>
+                            ${product.specs}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-video">
+                    <video controls preload="metadata" poster="${product.image}">
+                        <source src="${product.video}" type="video/mp4" />
+                        متصفحك لا يدعم تشغيل الفيديو.
+                    </video>
+                </div>
+
+                <div style="display: flex; justify-content: center; margin-top: 1rem;">
+                    <a href="https://wa.me/${product.whatsapp}?text=مرحباً%20أرغب%20في%20شراء%20${encodeURIComponent(product.name)}" 
+                       target="_blank" 
+                       class="whatsapp-btn">
+                        <i class="fab fa-whatsapp"></i> تواصل للطلب عبر واتساب
+                    </a>
+                </div>
+            `;
+
+            modalOverlay.classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            modalOverlay.classList.remove('open');
+            document.body.style.overflow = '';
+            const video = modalContent.querySelector('video');
+            if (video) video.pause();
+        }
+
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) closeModal();
+        });
+        modalClose.addEventListener('click', closeModal);
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        // ============================================================
+        //  التبويبات
+        // ============================================================
+        tabsContainer.addEventListener('click', (e) => {
+            const btn = e.target.closest('.tab-btn');
+            if (!btn) return;
+
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            currentCategory = btn.dataset.category;
+            renderProducts();
+        });
+
+        // ============================================================
+        //  البحث ومسح البحث
+        // ============================================================
+        searchInput.addEventListener('input', (e) => {
+            searchQuery = e.target.value.trim();
+            clearSearchBtn.style.display = searchQuery.length > 0 ? 'block' : 'none';
+            renderProducts();
+        });
+
+        clearSearchBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            searchQuery = '';
+            clearSearchBtn.style.display = 'none';
+            searchInput.focus();
+            renderProducts();
+        });
+
+    </script>
+</body>
+</html>
